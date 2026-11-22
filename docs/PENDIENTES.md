@@ -8,7 +8,10 @@
 | Plataforma de fase 2 (el club usa Microsoft 365) | Por decidir con Sistemas |
 | Precios y licencias | [VERIFICAR] antes de cualquier contratación |
 | Correo de contacto del club | [DATO] |
-| Pruebas automatizadas y código de compilación | Reconstruir (se perdieron al reiniciarse el entorno) |
+| Pruebas automatizadas completas (91) y código de compilación | Reconstruir; solo se incluye `tests/test_store.py` |
+| Captura de formularios por externos | Requiere base con acceso anónimo (Supabase/M365) |
+| Envío real de correos y pases | Pendiente de fase 2 |
+| Inicio de sesión por perfil | Pendiente de fase 2 |
 
 ## Qué funciona hoy / qué es simulado / qué falta conectar
 - **Funciona en el navegador:** captura, folios, validaciones, autorización, pases con QR, caseta, turnos, pagos (con datos ficticios).
