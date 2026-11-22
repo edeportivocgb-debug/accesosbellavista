@@ -1,5 +1,5 @@
-ACCESOS BELLAVISTA · v2.1 (guarda en GitHub)
+ACCESOS BELLAVISTA · v2.2 (guarda en Supabase)
 1. Abra index.html con Chrome o Edge (doble clic). Es la matriz interna.
 2. Los formularios con enlace propio están en la carpeta formularios/ y las vistas del externo en externo/.
 3. Todo se guarda solo en este navegador. Si un enlace abre vacío, use Chrome o Edge, o sirva la carpeta con un servidor local (ver guía).
-4. Al abrir pide conectar con el repositorio privado de datos (ver docs/GUIA-GITHUB-DATOS.md). Nada se envía por correo.
+4. Al abrir pide su nombre y se conecta a Supabase (ver docs/GUIA-SUPABASE-DATOS.md). Sin inicio de sesión. Nada se envía por correo.
