@@ -9,11 +9,11 @@
 | Precios y licencias | [VERIFICAR] antes de cualquier contratación |
 | Correo de contacto del club | [DATO] |
 | Pruebas automatizadas completas (91) y código de compilación | Reconstruir; solo se incluye `tests/test_store.py` |
-| Captura de formularios por externos | Requiere base con acceso anónimo (Supabase/M365) |
+| Inicio de sesión (Supabase Auth) y reglas por perfil | Hoy cualquiera con el sitio puede leer y modificar los datos |
 | Envío real de correos y pases | Pendiente de fase 2 |
-| Inicio de sesión por perfil | Pendiente de fase 2 |
 
 ## Qué funciona hoy / qué es simulado / qué falta conectar
 - **Funciona en el navegador:** captura, folios, validaciones, autorización, pases con QR, caseta, turnos, pagos (con datos ficticios).
 - **Simulado:** envío de correos, notificaciones, enlaces "públicos".
-- **Por conectar (fase 2):** almacenamiento compartido, autenticación por perfiles, envío real de correo.
+- **Ya conectado (v2.2):** almacenamiento compartido en Supabase.
+- **Por conectar (fase 2):** autenticación por perfiles, envío real de correo.
