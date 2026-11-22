@@ -1,7 +1,7 @@
 'use strict';
 /* ==========================================================================
    ACCESOS BELLAVISTA · NÚCLEO DE DATOS DEL PROTOTIPO (v2)
-   SIMULADO: datos ficticios guardados solo en este navegador (localStorage).
+   Modo práctica: datos ficticios en localStorage. Modo producción: ver assets/store.js (GitHub).
    Lo comparten todas las páginas del sitio porque viven en el mismo origen.
    No es multiusuario, no envía correos y no está conectado a ninguna plataforma.
    ========================================================================== */
@@ -167,7 +167,8 @@ const movsDe = (f, pid) => db.movs.filter(m => m.folio === f && (!pid || m.perso
 const dentroAhora = (f, pid) => { const l = movsDe(f, pid).at(-1); return !!l && l.tipo === 'entrada'; };
 const can = (u, p) => !!u && (!BLOQUEO_POR_PERFIL || (PERM[u.perfil] || []).includes(p));
 function need(u, p) { if (!u) throw new PermError('Elija quién está actuando.'); if (!can(u, p)) throw new PermError('Su perfil no tiene permiso para esta acción.'); }
-function log(usuario, accion, folio, detalle) { db.hist.unshift({ cuando: nowISO(), usuario: typeof usuario === 'string' ? usuario : usuario.nombre, accion, folio: folio || '—', detalle: detalle || '' }); }
+function nombreLog(u) { const b = typeof u === 'string' ? u : u.nombre; const op = (typeof ABStore !== 'undefined' && ABStore.operador()) || ''; return op && !b.includes(op) ? b + ' · ' + op : b; }
+function log(usuario, accion, folio, detalle) { db.hist.unshift({ cuando: nowISO(), usuario: nombreLog(usuario), accion, folio: folio || '—', detalle: detalle || '' }); }
 function notify(n) { db.notifs.unshift(Object.assign({ id: nid('n'), cuando: nowISO(), estado: 'simulado', leida: false }, n)); }
 function nuevoFolio(pref) { db.seq[pref] = (db.seq[pref] || 0) + 1; return `${pref}-26-${String(db.seq[pref]).padStart(4, '0')}`; }
 function nombreSol(s) { const e = s.empresaId ? empresa(s.empresaId) : null; return e ? (e.comercial || e.razon) : s.departamento || '—'; }

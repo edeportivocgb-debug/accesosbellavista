@@ -8,7 +8,7 @@ const paseChip = e => `<span class="chip st-${PASES[e][1]}">${PASES[e][0]}</span
 const lpChip = e => `<span class="chip st-${LINEA_PAGO[e][1]}">${LINEA_PAGO[e][0]}</span>`;
 const segChip = e => `<span class="chip st-${SEGUIMIENTO[e][1]}">${SEGUIMIENTO[e][0]}</span>`;
 const empty = (t, txt, act) => `<div class="empty"><div class="t">${t}</div><div>${txt || ''}</div>${act || ''}</div>`;
-const simBar = (extra) => `<div class="sim-bar" role="note"><b>Prototipo con datos ficticios.</b> Todo se guarda solo en este navegador; no es multiusuario y no envía correos reales.${extra || ''}</div>`;
+const simBar = (extra) => ABStore.barHTML(extra);
 function toast(msg, err) { let t = $('#toast'); if (!t) { t = document.createElement('div'); t.id = 'toast'; t.setAttribute('role', 'status'); t.setAttribute('aria-live', 'polite'); document.body.appendChild(t); } t.className = 'toast' + (err ? ' err' : ''); t.textContent = msg; clearTimeout(toast._t); toast._t = setTimeout(() => t.remove(), 4500); }
 function errBox(el, msg) { el.innerHTML = '<b>Revise lo siguiente:</b><ul style="margin:6px 0 0;padding-left:18px">' + String(msg).split(/(?<=\.)\s+(?=[A-ZÁÉÍÓÚÑ"¿0-9])/).map(x => `<li>${esc(x)}</li>`).join('') + '</ul>'; el.hidden = false; el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
 function isAppErr(e) { return e instanceof RuleError || e instanceof PermError; }

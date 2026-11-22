@@ -33,10 +33,10 @@ function pageProveedores(done) {
    <div id="err" class="note err" hidden role="alert"></div>
    <button class="btn primary big" type="submit">Enviar solicitud</button></form></div>`);
   document.querySelectorAll('input[name=mod]').forEach(r => r.onchange = () => { const p = r.value === 'paqueteria' && r.checked; if (!r.checked) return; $('#fs-per').hidden = p; $('#fs-veh').hidden = p; $('#fs-paq').hidden = !p; $('#paqnote').hidden = !p; });
-  $('#f').onsubmit = e => { e.preventDefault(); const v = id => $('#' + id).value.trim(); const mod = $('input[name=mod]:checked').value; const paq = mod === 'paqueteria';
+  $('#f').onsubmit = async e => { e.preventDefault(); const v = id => $('#' + id).value.trim(); const mod = $('input[name=mod]:checked').value; const paq = mod === 'paqueteria';
     if (!$('#priv').checked) { errBox($('#err'), 'Acepte el aviso de privacidad.'); return; }
     const d = { modalidad: mod, empresa: { razon: v('razon'), comercial: v('comercial'), contratista: v('contratista') }, contacto: { nombre: v('cnom'), correo: v('cmail'), tel: v('ctel').replace(/\D/g, '') }, recibe: { area: v('rarea'), persona: v('rper') }, fini: v('fini'), ffin: v('ffin'), hini: v('hini'), hfin: v('hfin'), personas: paq ? [] : readDyn('per').map(p => ({ ...p, tel: (p.tel || '').replace(/\D/g, '') })), paq: paq ? { guia: v('guia'), paqueteria: v('paqueteria'), bultos: +v('bultos') || 1 } : null, mercancia: readDyn('merc').map(m => ({ ...m, cant: +m.cant })), retira: readDyn('ret').map(m => ({ ...m, cant: +m.cant })), equipo: readDyn('eq').map(m => ({ ...m, cant: +m.cant })), vehiculos: paq ? [] : readDyn('veh'), obs: v('obs') };
-    try { loadDB(); const r = api.recibirFormulario('proveedores', d); pageProveedores(r.folio); window.scrollTo({ top: 0 }); } catch (ex) { if (isAppErr(ex)) errBox($('#err'), ex.message); else throw ex; } };
+    try { await ABStore.actualizar(); const r = api.recibirFormulario('proveedores', d); pageProveedores(r.folio); window.scrollTo({ top: 0 }); } catch (ex) { if (isAppErr(ex)) errBox($('#err'), ex.message); else throw ex; } };
 }
 
 /* ---------- Patrocinadores (enlace por torneo) ---------- */
@@ -60,9 +60,9 @@ function pagePatrocinadores(done) {
    ${t.controlObjetos ? `<fieldset><legend><span class="n">07</span>Objetos y mobiliario que ingresan al campo de golf</legend><p class="hint">Se revisan al entrar y al salir. ${esc(t.objetosNota || '')}</p>${dynBlock('obj', [['desc', 'Objeto o mobiliario'], ['cant', 'Cantidad', 'number', 'min="1"']], [], '+ Agregar objeto')}</fieldset>` : ''}
    <fieldset><legend><span class="n">08</span>Observaciones</legend><textarea id="obs" aria-label="Observaciones"></textarea>${PRIV}</fieldset>
    <div id="err" class="note err" hidden role="alert"></div><button class="btn primary big" type="submit">Enviar registro</button></form></div>`);
-  $('#f').onsubmit = e => { e.preventDefault(); if (!$('#priv').checked) { errBox($('#err'), 'Acepte el aviso de privacidad.'); return; }
+  $('#f').onsubmit = async e => { e.preventDefault(); if (!$('#priv').checked) { errBox($('#err'), 'Acepte el aviso de privacidad.'); return; }
     const d = { enlace: tk, empresa: { razon: $('#razon').value.trim() }, personas: readDyn('resp').map(p => ({ ...p, tel: (p.tel || '').replace(/\D/g, ''), responsable: true })).concat(readDyn('part').map(p => ({ ...p, tel: '', responsable: false }))), idConfirmada: $('#idok').checked, vehiculos: readDyn('veh'), equipo: readDyn('eq').map(m => ({ ...m, cant: +m.cant })), instalaciones: $('#inst').value.trim(), montaje: { descarga: $('input[name=desc]:checked').value === 'si', necesidades: $('#nec').value.trim() }, objetosCampo: t.controlObjetos ? readDyn('obj').map(m => ({ ...m, cant: +m.cant })) : [], obs: $('#obs').value.trim() };
-    try { loadDB(); const r = api.recibirFormulario('patrocinadores', d); pagePatrocinadores(r); window.scrollTo({ top: 0 }); } catch (ex) { if (isAppErr(ex)) errBox($('#err'), ex.message); else throw ex; } };
+    try { await ABStore.actualizar(); const r = api.recibirFormulario('patrocinadores', d); pagePatrocinadores(r); window.scrollTo({ top: 0 }); } catch (ex) { if (isAppErr(ex)) errBox($('#err'), ex.message); else throw ex; } };
 }
 
 /* ---------- Staff (enlace para el responsable interno) ---------- */
@@ -95,9 +95,8 @@ function pageExpediente() {
    <div class="card"><dl class="kv"><dt>Nombre</dt><dd><b>${esc(x.nombre)}</b></dd><dt>Folio</dt><dd class="mono">${x.folio}</dd><dt>Estado</dt><dd>${chip(x.estado)} ${paseChip(x.paseEstado)}</dd><dt>Jornadas</dt><dd>${x.ventanas.map(v => `${fmtD(v.fecha)} ${v.hini}–${v.hfin}`).join('<br>') || '—'}</dd></dl></div>
    <div class="card"><div class="card-h"><h2>Identificación</h2>${x.idEstado === 'recibida' ? '<span class="chip st-ok">Recibida</span>' : '<span class="chip st-pend">Falta</span>'}</div>
    ${x.idEstado === 'recibida' ? '<p class="muted">RH ya tiene su identificación.</p>' : `<div class="field"><label for="doc">Copia legible de su credencial para votar</label><input type="file" id="doc" accept="image/*,application/pdf"></div><div class="note warn" style="margin-top:10px">Prototipo: el archivo no se guarda ni se envía; solo se marca como recibido.</div><div class="row-actions" style="margin-top:10px"><button class="btn primary" id="sub">Enviar identificación</button></div>`}</div></div>`);
-  const b = $('#sub'); if (b) b.onclick = () => { if (!$('#doc').files.length) { toast('Elija el archivo.', true); return; } try { loadDB(); api.subirDocumento(x.token, $('#doc').files[0].name); toast('Identificación recibida.'); pageExpediente(); } catch (ex) { if (isAppErr(ex)) toast(ex.message, true); else throw ex; } };
+  const b = $('#sub'); if (b) b.onclick = async () => { if (!$('#doc').files.length) { toast('Elija el archivo.', true); return; } try { await ABStore.actualizar(); api.subirDocumento(x.token, $('#doc').files[0].name); toast('Identificación recibida.'); pageExpediente(); } catch (ex) { if (isAppErr(ex)) toast(ex.message, true); else throw ex; } };
 }
 
-loadDB();
-({ proveedores: pageProveedores, patrocinadores: pagePatrocinadores, staff: pageStaff, pase: pagePase, expediente: pageExpediente })[PAGE]();
+ABStore.ready().then(() => { ({ proveedores: pageProveedores, patrocinadores: pagePatrocinadores, staff: pageStaff, pase: pagePase, expediente: pageExpediente })[PAGE](); });
 window.addEventListener('hashchange', () => { if (PAGE !== 'proveedores' && PAGE !== 'staff') ({ patrocinadores: pagePatrocinadores, pase: pagePase, expediente: pageExpediente })[PAGE](); });

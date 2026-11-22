@@ -270,3 +270,11 @@ td .row-actions{min-width:230px}
 td .row-actions .btn.sm{white-space:nowrap}
 .kpis.k4{grid-template-columns:repeat(4,minmax(0,1fr))}
 @media (max-width:860px){.kpis.k4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Barra de estado de datos (modo producción) */
+.sync-bar{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center;padding:6px 16px;background:var(--primary);color:#fff;font-size:13px}
+.sync-bar .dot{width:9px;height:9px;border-radius:50%;background:#7bd389;flex:none}
+.sync-bar.pendiente .dot{background:#f2c14e}.sync-bar.sinred .dot,.sync-bar.error .dot{background:#ff8a80}
+.sync-bar .meta{opacity:.8}.sync-bar .acts{margin-left:auto;display:flex;gap:8px}
+.sync-bar button{background:transparent;border:1px solid rgba(255,255,255,.55);color:#fff;border-radius:6px;padding:1px 10px;cursor:pointer;font-size:12px}
+@media print{.sync-bar{display:none!important}}

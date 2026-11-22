@@ -26,7 +26,7 @@ function render() {
   const badge = v => v === 'rh' ? `<span class="badges">${c.sinRev ? `<span class="badge" title="Pendientes de revisar">${c.sinRev}</span>` : ''}${c.nov ? `<span class="badge new" title="Novedades sin leer">+${c.nov}</span>` : ''}</span>` : v === 'caseta' && c.dentro ? `<span class="badge" ${c.venc ? 'style="background:var(--rej-ink);color:#fff"' : ''}>${c.dentro}</span>` : v === 'pagos' && c.pagoVal ? `<span class="badge new">${c.pagoVal}</span>` : v === 'patrocinios' && c.espera ? `<span class="badge new" title="En lista de espera">${c.espera}</span>` : v === 'historial' && c.inc ? `<span class="badge" style="background:var(--pend-ink);color:var(--bg)">${c.inc}</span>` : '';
   $('#app').innerHTML = simBar(' <button data-act="reset">Restablecer datos de ejemplo</button>') + `<div class="shell"><aside class="side ${ui.menu ? 'open' : ''}" id="side"><div class="brand"><div class="w">BELLAVISTA</div><div class="s">Golf &amp; Country Club · Accesos</div><div class="prov">Identidad provisional. Se sustituye por el logotipo oficial.</div></div>
     <nav class="menu" aria-label="Matriz interna">${NAV.map(([g, it]) => `<div class="grp">${g}</div>` + it.map(([v, l]) => `<button data-act="go" data-v="${v}" ${ui.view === v || (ui.view === 'ficha' && v === 'rh') ? 'aria-current="page"' : ''}><span>${l}</span>${badge(v)}</button>`).join('')).join('')}</nav></aside>
-    <div class="main"><header class="top"><div class="who"><button class="btn sm menu-toggle" data-act="menu" aria-expanded="${ui.menu}">Menú</button><label for="actor">Actuando como (simulado)</label><select id="actor" data-ch="actor">${db.usuarios.map(x => `<option value="${x.id}" ${x.id === u.id ? 'selected' : ''}>${esc(x.nombre)} · ${PERFILES[x.perfil]}</option>`).join('')}</select></div><div class="who"><span class="tag">Sin bloqueos por perfil</span><span class="muted" style="font-size:13px">${fmtD(today())}</span></div></header>
+    <div class="main"><header class="top"><div class="who"><button class="btn sm menu-toggle" data-act="menu" aria-expanded="${ui.menu}">Menú</button><label for="actor">${ABStore.modoPractica() ? 'Actuando como (simulado)' : 'Operando como'}</label><select id="actor" data-ch="actor">${db.usuarios.map(x => `<option value="${x.id}" ${x.id === u.id ? 'selected' : ''}>${esc(x.nombre)} · ${PERFILES[x.perfil]}</option>`).join('')}</select></div><div class="who">${ABStore.modoPractica() ? '<span class="tag">Sin bloqueos por perfil</span>' : ''}<span class="muted" style="font-size:13px">${fmtD(today())}</span></div></header>
     <main class="content" id="main">${view(u)}</main></div></div>${ui.modal ? modal(u) : ''}`;
   drawQR(); const f = $('[data-autofocus]'); if (f) f.focus();
   if (ui.view === 'staff') { const box = $('#pl'); if (box) plBind(box, { enMatriz: true, onSent: () => setTimeout(render, 50) }); }
@@ -100,7 +100,8 @@ function vProveedores() {
 
 /* ---------- Logística de patrocinios (Fer) ---------- */
 function vPatrocinios() {
-  const torneos = db.eventos.filter(e => e.tipo === 'torneo'); const eid = ui.p.eid || (torneos[0] || {}).id; const ev = evento(eid); const tc = torneo(eid) || { eventoId: eid, fechaMontaje: ev.fini, puerta: CFG.puertas[1], lugar: '', zona: '', ingresoIni: '07:00', ingresoFin: '11:00', turnoMin: 30, capVeh: 2, tolMin: 15, cierreRegistro: addD(ev.fini, -3) + 'T18:00', descarga: ['07:00', '09:00'], montaje: ['07:00', '13:00'], desmontaje: [ev.ffin, '17:00', '20:00'], controlObjetos: true, objetosNota: '' };
+  const torneos = db.eventos.filter(e => e.tipo === 'torneo');
+  if (!torneos.length) return pageH('Eventos y patrocinios', 'Logística de patrocinios', 'Configuración de torneos, turnos y enlace del formulario.') + empty('Todavía no hay torneos', 'Da de alta un evento de tipo torneo en el catálogo de eventos para configurarlo aquí.', '<div style="margin-top:10px"><button class="btn primary" data-act="go" data-v="eventos">Ir al catálogo de eventos</button></div>'); const eid = ui.p.eid || (torneos[0] || {}).id; const ev = evento(eid); const tc = torneo(eid) || { eventoId: eid, fechaMontaje: ev.fini, puerta: CFG.puertas[1], lugar: '', zona: '', ingresoIni: '07:00', ingresoFin: '11:00', turnoMin: 30, capVeh: 2, tolMin: 15, cierreRegistro: addD(ev.fini, -3) + 'T18:00', descarga: ['07:00', '09:00'], montaje: ['07:00', '13:00'], desmontaje: [ev.ffin, '17:00', '20:00'], controlObjetos: true, objetosNota: '' };
   const t = ui.tab || 'seguimiento'; const regs = db.solicitudes.filter(s => s.tipo === 'patrocinio' && s.eventoId === eid);
   let body = '';
   if (t === 'config') body = `<form class="card" id="tcform"><input type="hidden" id="tc-e" value="${eid}"><div class="fgrid">
@@ -348,6 +349,6 @@ window.addEventListener('storage', e => { if (e.key === STORE_KEY) { loadDB(); i
 window.addEventListener('focus', () => { const before = JSON.stringify(db.seq); loadDB(); if (JSON.stringify(db.seq) !== before && !ui.modal) render(); });
 
 $('#app').innerHTML = `<div class="loading" style="min-height:80vh"><div class="spinner"></div><span>Cargando Accesos Bellavista…</span></div>`;
-const origen = loadDB();
-setTimeout(() => { render(); if (origen === 'seed') toast('Datos de ejemplo cargados para hoy.'); }, 350);
+ABStore.onChange = () => { if (!ui.modal) render(); };
+ABStore.ready().then(origen => { render(); if (origen === 'seed') toast('Datos de ejemplo cargados para hoy.'); });
 window.AB = { api, get db() { return db; }, ui, render, go, resetDB, U, solByFolio, persona, vigencia, today, loadDB };
