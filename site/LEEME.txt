@@ -1,5 +1,5 @@
-ACCESOS BELLAVISTA · PROTOTIPO (datos ficticios)
+ACCESOS BELLAVISTA · v2.1 (guarda en GitHub)
 1. Abra index.html con Chrome o Edge (doble clic). Es la matriz interna.
 2. Los formularios con enlace propio están en la carpeta formularios/ y las vistas del externo en externo/.
 3. Todo se guarda solo en este navegador. Si un enlace abre vacío, use Chrome o Edge, o sirva la carpeta con un servidor local (ver guía).
-4. Nada se envía por correo ni se publica. Para empezar de cero: botón "Restablecer datos de ejemplo".
+4. Al abrir pide conectar con el repositorio privado de datos (ver docs/GUIA-GITHUB-DATOS.md). Nada se envía por correo.
