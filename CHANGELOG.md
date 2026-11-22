@@ -2,6 +2,15 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [2.1.0] – 2026-11-22
+### Agregado
+- Guardado de registros en `data/db.json` de un repositorio privado de GitHub; cada guardado es un commit descriptivo.
+- Fusión por registro cuando varias personas guardan a la vez; cola de cambios sin conexión.
+- Pantalla de conexión (repositorio, token, nombre del operador); rechaza repositorios públicos.
+- Barra de estado de guardado; se retiró la leyenda de prototipo y el botón de restablecer en modo producción.
+- Base inicial vacía (sin datos de ejemplo ni nombres de personas); *modo práctica* conserva los datos ficticios.
+- Vista de patrocinios con estado vacío cuando no hay torneos.
+
 ## [Sin publicar] – Actualización 3
 ### Pendiente de implementar
 - Navegación en seis apartados con subpestañas: Inicio, Vigilancia, Proveedores, Patrocinios, Staff externo, Recursos Humanos.
